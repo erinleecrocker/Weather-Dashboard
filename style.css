@@ -1,0 +1,19 @@
+h1 {
+    text-align: center;
+    background-color: rgb(78, 78, 78);
+    color: white;
+    margin: 0px;
+};
+
+form {
+	display: flex;
+}
+
+#sideBar {
+    height: 100%;
+    background-color: lightgrey;
+    background-size: auto;
+    border-top: solid, lightgrey, 10px;
+    padding-left: 15px;
+    padding-top: 5px;
+}
