@@ -108,11 +108,25 @@ var weatherInfoPartTwo = function() {
         //5 day forecast 
 
         storeCityInfo();
+        displayPreviousSearch();
     });
 
 
 }
 
+var displayPreviousSearch = function() {
+    $("#recent-city").empty()
+    var previousSearchEl = $("<li>");
+    previousSearchEl.addClass("list-group-item list-group-item-action");
+    previousSearchEl.text(cityInfo[0].name)
+    $("#recent-city").append(previousSearchEl)
+
+
+}
+
+var displayMainCityInfo = function(){
+
+}
 
 // set up array of objects to be displayed in main depending
 
