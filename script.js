@@ -12,6 +12,14 @@ var cityInfo = [
 
 ]
 
+var fiveDayForecast = [
+    {
+        icon: [],
+        temp: [],
+        humidity: [],
+    }
+]
+
 function init() {
     // Parsing the JSON string to time block object
     var storedCityInfo = JSON.parse(localStorage.getItem("cityInfo"));
@@ -42,6 +50,8 @@ $("#city-search-button").mouseup(function(event) {
     event.preventDefault();
 
     weatherInfoPartTwo();
+
+    displayMainCityInfo();
 });
 
 //First AJAX call
@@ -52,34 +62,20 @@ var weatherInfoPartOne = function() {
     var APIKey = "4c8113c3872d27727117d0ff8046adaa";
 
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey + "&units=imperial";
-
-
+    
     $.ajax({
       url: queryURL,
       method: "GET"
     }).then(function(response) {
-        //console.log(queryURL);
-        //console.log(response);
-
         cityInfo[0].lon = response.coord.lon;
-        console.log(cityInfo[0].lon);
         cityInfo[0].lat = response.coord.lat;
-        console.log(cityInfo[0].lat);
         cityInfo[0].name = response.name;
-        console.log(cityInfo[0].name);
-        //---- icon problems meh
-        //cityInfo[0].icon = response.weather.icon;
-        //console.log(cityInfo[0].icon);
+        cityInfo[0].icon = response.weather.icon;
         cityInfo[0].temp = response.main.temp;
-        console.log(cityInfo[0].temp);
         cityInfo[0].humidity = response.main.humidity;
-        console.log(cityInfo[0].humidity);
         cityInfo[0].wind = response.wind.speed;
-        console.log(cityInfo[0].wind);
-
         storeCityInfo();
     });
-
 };
 
 //SecondAJAX call has UV index and 5 day forcast 
@@ -87,8 +83,8 @@ var weatherInfoPartTwo = function() {
     
     init();
 
-    console.log(cityInfo[0].lat);
-    console.log(cityInfo[0].lon);
+    //console.log(cityInfo[0].lat);
+    //console.log(cityInfo[0].lon);
     //API key
     var APIKey = "4c8113c3872d27727117d0ff8046adaa";
     //Query url
@@ -99,12 +95,22 @@ var weatherInfoPartTwo = function() {
     $.ajax({
     url: queryURL,
     method: "GET"
-    }).then(function(response) {
-        console.log(queryURL);
-        //console.log(response);
-        console.log(response);
-        //UV index
+    }).then (function(response) {
 
+        cityInfo[0].UVindex = response.daily[0].uvi
+        for (i=1; i<5; i++) {
+            console.log(response.daily[i].temp.day);
+            console.log(response.daily[1].humidity);
+
+        }
+        //console.log(queryURL);
+        //console.log(response);
+        //console.log(response.daily[0].uvi)
+        //console.log(response.daily[1].temp.day);
+    
+        //console.log(response.daily[1].humidity)
+        //UV index
+        
         //5 day forecast 
 
         storeCityInfo();
@@ -125,8 +131,33 @@ var displayPreviousSearch = function() {
 }
 
 var displayMainCityInfo = function(){
+    
+    var cityMainInfoDiv = $("<div>")
+    var cityMainInfoEl = $("#city-display");
+    var cityMainInfo = $("<div>");
+    var cityEl = $("<h3>");
+    var tempEl = $("<p>");
+    var humidityEl = $("<p>");
+    var windEl = $("<p>");
+    var uvIndexEl = $("<p>");
 
-}
+    cityMainInfoDiv.addClass("card mt-3");
+    cityMainInfo.addClass("card-body");
+    cityEl.text((cityInfo[0].name) + "  current date  " + cityInfo[0].icon);
+    humidityEl.text("Humidity: " + cityInfo[0].humidity + "%");
+    tempEl.text("Temperature: " + cityInfo[0].temp + "degrees F");
+    windEl.text("Wind Speed: " + cityInfo[0].wind + "MPH");
+    uvIndexEl.text("UV Index: " + cityInfo[0].UVindex);
+
+    cityMainInfoEl.append(cityMainInfoDiv);
+    cityMainInfoDiv.append(cityMainInfo)
+    cityMainInfo.append(cityEl);
+    cityMainInfo.append(tempEl);
+    cityMainInfo.append(humidityEl);
+    cityMainInfo.append(windEl);
+    cityMainInfo.append(uvIndexEl);
+
+};
 
 // set up array of objects to be displayed in main depending
 
