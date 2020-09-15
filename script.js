@@ -8,17 +8,16 @@ var cityInfo = [
         humidity: "", 
         wind: "",
         UVindex: ""
-    }
-
-]
-
-var fiveDayForecast = [
+    },
     {
         icon: [],
         temp: [],
         humidity: [],
     }
+
 ]
+
+init();
 
 function init() {
     // Parsing the JSON string to time block object
@@ -70,39 +69,34 @@ var weatherInfoPartOne = function() {
         cityInfo[0].lon = response.coord.lon;
         cityInfo[0].lat = response.coord.lat;
         cityInfo[0].name = response.name;
-        cityInfo[0].icon = response.weather.icon;
+        //cityInfo[0].icon = response.weather.icon;
         cityInfo[0].temp = response.main.temp;
         cityInfo[0].humidity = response.main.humidity;
         cityInfo[0].wind = response.wind.speed;
+
         storeCityInfo();
     });
 };
 
 //SecondAJAX call has UV index and 5 day forcast 
 var weatherInfoPartTwo = function() {
-    
-    init();
 
-    //console.log(cityInfo[0].lat);
-    //console.log(cityInfo[0].lon);
-    //API key
     var APIKey = "4c8113c3872d27727117d0ff8046adaa";
-    //Query url
     var queryURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityInfo[0].lat + "&lon=" + cityInfo[0].lon + "&exclude={part}&appid=" + APIKey + "&units=imperial";
-
-   
 
     $.ajax({
     url: queryURL,
     method: "GET"
     }).then (function(response) {
 
-        cityInfo[0].UVindex = response.daily[0].uvi
-        for (i=1; i<5; i++) {
-            console.log(response.daily[i].temp.day);
+        cityInfo[0].UVindex = response.daily[0].uvi;
+
+        for (i=0; i<5; i++) {
+
+            console.log(response.daily[1].temp.day);
             console.log(response.daily[1].humidity);
 
-        }
+        };
         //console.log(queryURL);
         //console.log(response);
         //console.log(response.daily[0].uvi)
@@ -126,12 +120,11 @@ var displayPreviousSearch = function() {
     previousSearchEl.addClass("list-group-item list-group-item-action");
     previousSearchEl.text(cityInfo[0].name)
     $("#recent-city").append(previousSearchEl)
-
-
 }
 
 var displayMainCityInfo = function(){
     
+    $("#city-display").empty()
     var cityMainInfoDiv = $("<div>")
     var cityMainInfoEl = $("#city-display");
     var cityMainInfo = $("<div>");
@@ -143,7 +136,7 @@ var displayMainCityInfo = function(){
 
     cityMainInfoDiv.addClass("card mt-3");
     cityMainInfo.addClass("card-body");
-    cityEl.text((cityInfo[0].name) + "  current date  " + cityInfo[0].icon);
+    cityEl.text((cityInfo[0].name) + "  current date  ");
     humidityEl.text("Humidity: " + cityInfo[0].humidity + "%");
     tempEl.text("Temperature: " + cityInfo[0].temp + "degrees F");
     windEl.text("Wind Speed: " + cityInfo[0].wind + "MPH");
@@ -158,6 +151,44 @@ var displayMainCityInfo = function(){
     cityMainInfo.append(uvIndexEl);
 
 };
+
+// var fiveDayForecast = function() {
+//     var title = $("<h4>")
+//     var fiveDayForecastEl = $("<div>");
+//     var cardBase = 
+// }
+
+var forcastDisplay = function() {
+    // create element
+    var forcastDiv = $("<div>");
+    forcastDiv.addClass("card text-white bg-primary mb-3 ml-4 mt-2");
+    forcastEl = $("<div>");
+    forcastEl.addClass("card-body");
+    forcastTitle = $("<h5>");
+    forcastTitle.addClass("card-title");
+    forcastTemp = $("<p>");
+    forcastTemp.addClass("card-text");
+    forcastHumidity = $("<p>");
+    forcastHumidity.addClass("card-text");
+
+    // add content
+
+
+    // append to existing
+    $("#forcastInfo").append(forcastDiv);
+    forcastDiv.append(forcastEl);
+    forcastEl.append(forcastTitle);
+    forcastEl.append(forcastTemp);
+    forcastEl.append(forcastHumidity);
+   
+}
+
+ 
+
+
+
+
+
 
 // set up array of objects to be displayed in main depending
 
