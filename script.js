@@ -13,9 +13,9 @@ var cityInfo = [
         icon: [],
         temp: [],
         humidity: [],
-    }
-
-]
+    },
+    
+];
 
 init();
 
@@ -30,31 +30,14 @@ function init() {
    
 };
 
-
 var storeCityInfo = function(){
-    localStorage.setItem("cityInfo",JSON.stringify(cityInfo))
+    localStorage.setItem("cityInfo",JSON.stringify(cityInfo));
 };
 
-// mousedown function will trigger the first AJAX Call
-$("#city-search-button").mousedown(function(event) {
-
-    event.preventDefault();
-
-    weatherInfoPartOne();
-});
-
 // mouseup function will trigger the first AJAX Call
-$("#city-search-button").mouseup(function(event) {
-    
+$("#city-search-button").click(function(event) {
+
     event.preventDefault();
-
-    weatherInfoPartTwo();
-
-    displayMainCityInfo();
-});
-
-//First AJAX call
-var weatherInfoPartOne = function() {
 
     var city = $("#city-search").val();
  
@@ -66,6 +49,7 @@ var weatherInfoPartOne = function() {
       url: queryURL,
       method: "GET"
     }).then(function(response) {
+
         cityInfo[0].lon = response.coord.lon;
         cityInfo[0].lat = response.coord.lat;
         cityInfo[0].name = response.name;
@@ -73,55 +57,46 @@ var weatherInfoPartOne = function() {
         cityInfo[0].temp = response.main.temp;
         cityInfo[0].humidity = response.main.humidity;
         cityInfo[0].wind = response.wind.speed;
-
-        storeCityInfo();
-    });
-};
-
-//SecondAJAX call has UV index and 5 day forcast 
-var weatherInfoPartTwo = function() {
-
-    var APIKey = "4c8113c3872d27727117d0ff8046adaa";
-    var queryURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityInfo[0].lat + "&lon=" + cityInfo[0].lon + "&exclude={part}&appid=" + APIKey + "&units=imperial";
-
-    $.ajax({
-    url: queryURL,
-    method: "GET"
-    }).then (function(response) {
-
-        cityInfo[0].UVindex = response.daily[0].uvi;
-
-        for (i=0; i<5; i++) {
-
-            console.log(response.daily[1].temp.day);
-            console.log(response.daily[1].humidity);
-
-        };
-        //console.log(queryURL);
-        //console.log(response);
-        //console.log(response.daily[0].uvi)
-        //console.log(response.daily[1].temp.day);
-    
-        //console.log(response.daily[1].humidity)
-        //UV index
         
-        //5 day forecast 
+        var APIKey = "4c8113c3872d27727117d0ff8046adaa";
+        var queryURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityInfo[0].lat + "&lon=" + cityInfo[0].lon + "&exclude={part}&appid=" + APIKey + "&units=imperial";
+        
+        $.ajax({
+        url: queryURL,
+        method: "GET"
+        }).then (function(response) {
+            
+            cityInfo[0].UVindex = response.daily[0].uvi;
+            // clear previous forcast
+            cityInfo[1].icon = [];
+            cityInfo[1].temp = [];
+            cityInfo[1].humidity = [];
 
-        storeCityInfo();
-        displayPreviousSearch();
+            for (i=1; i<6; i++) {
+                
+                //console.log(response.daily[i].temp.day);
+                cityInfo[1].temp.push(response.daily[i].temp.day);
+                cityInfo[1].humidity.push(response.daily[i].humidity);
+    
+            };
+            
+            storeCityInfo();
+            displayMainCityInfo();
+            forcastDisplay();
+            displayPreviousSearch();
+        });
     });
-
-
-}
-
+});
+// display previous search
 var displayPreviousSearch = function() {
-    $("#recent-city").empty()
+
+    $("#recent-city").empty();
     var previousSearchEl = $("<li>");
     previousSearchEl.addClass("list-group-item list-group-item-action");
-    previousSearchEl.text(cityInfo[0].name)
-    $("#recent-city").append(previousSearchEl)
-}
-
+    previousSearchEl.text(cityInfo[0].name);
+    $("#recent-city").prepend(previousSearchEl);
+};
+// display weather info
 var displayMainCityInfo = function(){
     
     $("#city-display").empty()
@@ -138,8 +113,8 @@ var displayMainCityInfo = function(){
     cityMainInfo.addClass("card-body");
     cityEl.text((cityInfo[0].name) + "  current date  ");
     humidityEl.text("Humidity: " + cityInfo[0].humidity + "%");
-    tempEl.text("Temperature: " + cityInfo[0].temp + "degrees F");
-    windEl.text("Wind Speed: " + cityInfo[0].wind + "MPH");
+    tempEl.text("Temperature: " + cityInfo[0].temp + " ˚F");
+    windEl.text("Wind Speed: " + cityInfo[0].wind + " MPH");
     uvIndexEl.text("UV Index: " + cityInfo[0].UVindex);
 
     cityMainInfoEl.append(cityMainInfoDiv);
@@ -151,72 +126,38 @@ var displayMainCityInfo = function(){
     cityMainInfo.append(uvIndexEl);
 
 };
-
-// var fiveDayForecast = function() {
-//     var title = $("<h4>")
-//     var fiveDayForecastEl = $("<div>");
-//     var cardBase = 
-// }
-
+// display 5 day forcast
 var forcastDisplay = function() {
-    // create element
-    var forcastDiv = $("<div>");
-    forcastDiv.addClass("card text-white bg-primary mb-3 ml-4 mt-2");
-    forcastEl = $("<div>");
-    forcastEl.addClass("card-body");
-    forcastTitle = $("<h5>");
-    forcastTitle.addClass("card-title");
-    forcastTemp = $("<p>");
-    forcastTemp.addClass("card-text");
-    forcastHumidity = $("<p>");
-    forcastHumidity.addClass("card-text");
+    
+    $("#forcastInfo").empty();
 
-    // add content
+    var fiveDayForcast = $("<h4>");
+    fiveDayForcast.addClass("mt-4");
+    $("#fiveDayForcast").append(fiveDayForcast);
 
-
-    // append to existing
-    $("#forcastInfo").append(forcastDiv);
-    forcastDiv.append(forcastEl);
-    forcastEl.append(forcastTitle);
-    forcastEl.append(forcastTemp);
-    forcastEl.append(forcastHumidity);
-   
-}
-
- 
-
-
-
-
-
-
-// set up array of objects to be displayed in main depending
-
-// on query results 
-
-
-//---- city search
-// create variable to save user input
-// save user input to the local storage 
-
-// -------- ajax query search based on city name 
-// --------- take returned information and display in main: 
-// city (date) weather icon header
-// temperature in F
-// humidity 
-// windspeed mph
-// uv index (color-coded)
-// --- take returned information and display below main:
-// 5 day forecast: 5 columns (card class)
-// date
-// weather icon
-// temp in F
-// humididty
-
-
-
-// --- show last searched city below searchbar
-// create element
-// add content (user input)
-// append to existing element (div below searchbar)
-
+    for (i=0; i<cityInfo[1].temp.length; i++) {
+        // create element
+        var forcastDiv = $("<div>");
+        forcastDiv.addClass("card text-white bg-primary mb-3 ml-4 mt-2");
+        forcastDiv.attr("style","max-width: 15rem");
+        var forcastEl = $("<div>");
+        forcastEl.addClass("card-body");
+        var forcastTitle = $("<h5>");
+        forcastTitle.addClass("card-title");
+        var forcastTemp = $("<p>");
+        forcastTemp.addClass("card-text");
+        var forcastHumidity = $("<p>");
+        forcastHumidity.addClass("card-text");
+        // add content
+        forcastTitle.text("00/00/00");
+        forcastTemp.text(cityInfo[1].temp[i] + " ˚F");
+        forcastHumidity.text(cityInfo[1].humidity[i] + "%");
+        // append to existing
+        $("#forcastInfo").append(forcastDiv);
+        forcastDiv.append(forcastEl);
+        forcastEl.append(forcastTitle);
+        forcastEl.append(forcastTemp);
+        forcastEl.append(forcastHumidity);
+    };
+    
+};
