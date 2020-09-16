@@ -1,4 +1,8 @@
-var cityInfo = [ 
+$(document).ready(function() {
+
+    var date = moment().format('M/D/YYYY');
+
+    var cityInfo = [ 
     {
         name: "",
         icon: "",
@@ -18,11 +22,11 @@ var cityInfo = [
         prev: [],
     }
     
-];
+    ];
 
-init();
+    init();
 
-function init() {
+    function init() {
 
     var storedCityInfo = JSON.parse(localStorage.getItem("cityInfo"));
 
@@ -30,14 +34,14 @@ function init() {
     cityInfo = storedCityInfo;
     } 
 
-};
+    };
 
-var storeCityInfo = function(){
+    var storeCityInfo = function(){
     localStorage.setItem("cityInfo",JSON.stringify(cityInfo));
-};
+    };
 
 // display previous search
-var displayPreviousSearch = function() {
+    var displayPreviousSearch = function() {
 
     if (cityInfo[2].prev.length > 0) {
     var previousSearchEl = $("<li>");
@@ -45,16 +49,17 @@ var displayPreviousSearch = function() {
     previousSearchEl.text(cityInfo[2].prev[0]);
     $("#recent-city").prepend(previousSearchEl);
     };
-};
+    };
 
 // display weather info
-var displayMainCityInfo = function(){
+    var displayMainCityInfo = function(){
     
     $("#city-display").empty()
     var cityMainInfoDiv = $("<div>")
     var cityMainInfoEl = $("#city-display");
     var cityMainInfo = $("<div>");
     var cityEl = $("<h3>");
+    var iconEl = $("<img>");
     var tempEl = $("<p>");
     var humidityEl = $("<p>");
     var windEl = $("<p>");
@@ -62,7 +67,8 @@ var displayMainCityInfo = function(){
 
     cityMainInfoDiv.addClass("card mt-3");
     cityMainInfo.addClass("card-body");
-    cityEl.text((cityInfo[0].name) + "  current date  ");
+    iconEl.attr("src","http://openweathermap.org/img/w/" + cityInfo[0].icon + ".png");
+    cityEl.text((cityInfo[0].name) + " " + date);
     humidityEl.text("Humidity: " + cityInfo[0].humidity + "%");
     tempEl.text("Temperature: " + cityInfo[0].temp + " ˚F");
     windEl.text("Wind Speed: " + cityInfo[0].wind + " MPH");
@@ -71,15 +77,15 @@ var displayMainCityInfo = function(){
     cityMainInfoEl.append(cityMainInfoDiv);
     cityMainInfoDiv.append(cityMainInfo);
     cityMainInfo.append(cityEl);
+    cityEl.append(iconEl);
     cityMainInfo.append(tempEl);
     cityMainInfo.append(humidityEl);
     cityMainInfo.append(windEl);
     cityMainInfo.append(uvIndexEl);
 
-};
-
+    };
 // display 5 day forcast
-var forcastDisplay = function() {
+    var forcastDisplay = function() {
     
     $("#forcastInfo").empty();
 
@@ -96,28 +102,30 @@ var forcastDisplay = function() {
         forcastEl.addClass("card-body");
         var forcastTitle = $("<h5>");
         forcastTitle.addClass("card-title");
+        var iconImg = $("<img>");
         var forcastTemp = $("<p>");
         forcastTemp.addClass("card-text");
         var forcastHumidity = $("<p>");
         forcastHumidity.addClass("card-text");
         // add content
-        forcastTitle.text("00/00/00");
+        iconImg.attr("src","http://openweathermap.org/img/w/" + cityInfo[1].icon[i] + ".png");
+        forcastTitle.text(moment().add((i + 1), 'days').format('M/D/YYYY'));
         forcastTemp.text(cityInfo[1].temp[i] + " ˚F");
         forcastHumidity.text(cityInfo[1].humidity[i] + "%");
         // append to existing
         $("#forcastInfo").append(forcastDiv);
         forcastDiv.append(forcastEl);
         forcastEl.append(forcastTitle);
+        forcastEl.append(iconImg);
         forcastEl.append(forcastTemp);
         forcastEl.append(forcastHumidity);
     };
     
-};
+    };
 
-displayPreviousSearch();
-
+    displayPreviousSearch();
 // click will trigger the event 
-$("#city-search-button").click(function(event) {
+    $("#city-search-button").click(function(event) {
 
     event.preventDefault();
 
@@ -138,7 +146,8 @@ $("#city-search-button").click(function(event) {
         cityInfo[0].lon = response.coord.lon;
         cityInfo[0].lat = response.coord.lat;
         cityInfo[0].name = response.name;
-        //cityInfo[0].icon = response.weather.icon;
+        cityInfo[0].icon = response.weather[0].icon;
+        //console.log(response.weather[0].icon);
         cityInfo[0].temp = response.main.temp;
         cityInfo[0].humidity = response.main.humidity;
         cityInfo[0].wind = response.wind.speed;
@@ -162,6 +171,7 @@ $("#city-search-button").click(function(event) {
                 //console.log(response.daily[i].temp.day);
                 cityInfo[1].temp.push(response.daily[i].temp.day);
                 cityInfo[1].humidity.push(response.daily[i].humidity);
+                cityInfo[1].icon.push(response.daily[i].weather[0].icon)
     
             };
             
@@ -171,10 +181,9 @@ $("#city-search-button").click(function(event) {
             displayPreviousSearch();
         });
     });
-});
+    });
 
-
-$(".city-click").click(function(event) {
+    $(".city-click").click(function(event) {
 
     console.log($(this).text());
     event.preventDefault();
@@ -196,7 +205,7 @@ $(".city-click").click(function(event) {
         cityInfo[0].lon = response.coord.lon;
         cityInfo[0].lat = response.coord.lat;
         cityInfo[0].name = response.name;
-        //cityInfo[0].icon = response.weather.icon;
+        cityInfo[0].icon = response.weather[0].icon;
         cityInfo[0].temp = response.main.temp;
         cityInfo[0].humidity = response.main.humidity;
         cityInfo[0].wind = response.wind.speed;
@@ -220,6 +229,8 @@ $(".city-click").click(function(event) {
                 //console.log(response.daily[i].temp.day);
                 cityInfo[1].temp.push(response.daily[i].temp.day);
                 cityInfo[1].humidity.push(response.daily[i].humidity);
+                cityInfo[1].icon.push(response.daily[i].weather[0].icon);
+
     
             };
             
@@ -229,4 +240,5 @@ $(".city-click").click(function(event) {
         });
     });
 
+    });
 });
